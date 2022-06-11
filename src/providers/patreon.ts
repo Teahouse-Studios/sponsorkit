@@ -1,4 +1,4 @@
-import { $fetch } from 'ohmyfetch'
+import axios from 'axios'
 import type { Provider, Sponsorship } from '../types'
 
 export const PatreonProvider: Provider = {
@@ -13,17 +13,15 @@ export async function fetchPatreonSponsors(token: string): Promise<Sponsorship[]
     throw new Error('Patreon token is required')
 
   // Get current authenticated user's campaign ID (Everyone has one default campaign)
-  const userData = await $fetch(
-    'https://www.patreon.com/api/oauth2/api/current_user/campaigns?include=null',
-    {
-      method: 'GET',
-      headers: {
-        'Authorization': `bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      responseType: 'json',
+  const userData = await axios({
+    url: "https://www.patreon.com/api/oauth2/api/current_user/campaigns?include=null",
+    method: "get",
+    headers: {
+      Authorization: `bearer ${token}`,
+      "Content-Type": "application/json",
     },
-  )
+    responseType: "json",
+  });
   const userCampaignId = userData.data[0].id
 
   const sponsors: any[] = []

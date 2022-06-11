@@ -1,4 +1,4 @@
-import { $fetch } from 'ohmyfetch'
+import axios from 'axios'
 import type { Provider, Sponsorship } from '../types'
 
 const API = 'https://api.github.com/graphql'
@@ -24,9 +24,10 @@ export async function fetchGitHubSponsors(token: string, login: string): Promise
   let cursor
   do {
     const query = makeQuery(login, cursor)
-    const data = await $fetch(API, {
+    const data = await axios({
+      url: API,
       method: 'POST',
-      body: { query },
+      data: { query },
       headers: {
         'Authorization': `bearer ${token}`,
         'Content-Type': 'application/json',
