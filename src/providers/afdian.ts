@@ -20,9 +20,8 @@ export async function fetchAfdianSponsors(
 
   const sponsors: any[] = []
   const sponsorshipApi = 'https://afdian.net/api/open/query-sponsor'
-  let page = 1
+  let page: number | null = 1
   do {
-    const requestTS = Date.now()
     const sponsorshipData = await $fetch(sponsorshipApi, {
       method: 'POST',
       headers: {
@@ -30,19 +29,16 @@ export async function fetchAfdianSponsors(
       },
       responseType: 'json',
       body: JSON.stringify(
-        generatePOSTData(id, token, JSON.stringify({ page }, requestTS))
+        generatePOSTData(id, token, JSON.stringify({ page }))
       ),
     })
-
-    console.log(
-      sponsorshipData,
-      generatePOSTData(id, token, JSON.stringify({ page }, requestTS))
-    )
     sponsors.push(
       ...sponsorshipData.data.list.map(
         (user: any): Sponsorship => ({
           sponsor: {
-            name: user.user.name,
+            name: user.user.name.includes('爱发电用户_')
+              ? '匿名'
+              : user.user.name,
             login: user.user.user_id,
             type: 'User',
             avatarUrl: user.user.avatar,
@@ -50,10 +46,11 @@ export async function fetchAfdianSponsors(
           monthlyDollars: user.all_sum_amount,
           tierName: user.current_plan.name || '自定义',
           isOneTime: false,
+          createdAt: `${new Date(user.created_time).valueOf()}`,
         })
       )
     )
-    page = sponsorshipData.data.total_page === page ? page++ : page
+    page = sponsorshipData.data.total_page === page ? null : page + 1
   } while (page)
 
   const processed = sponsors
@@ -67,12 +64,13 @@ function generatePOSTData(
   params: string,
   time = Date.now()
 ) {
-  const content = `${token}params${params}ts${time}user_id${id}`
+  const timeInSeconds = Math.floor(time / 1000)
+  const content = `${token}params${params}ts${timeInSeconds}user_id${id}`
   const signature = createHash('md5').update(content).digest('hex')
   return {
     user_id: id,
     params,
-    ts: time,
+    ts: timeInSeconds,
     sign: signature,
   }
 }

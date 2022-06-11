@@ -39,8 +39,7 @@ export async function run(inlineConfig?: SponsorkitConfig, t = consola) {
 
     await fs.ensureDir(dirname(cacheFile))
     await fs.writeJSON(cacheFile, allSponsors, { spaces: 2 })
-  }
-  else {
+  } else {
     allSponsors = await fs.readJSON(cacheFile)
     t.success(`Loaded from cache ${r(cacheFile)}`)
   }
@@ -54,10 +53,14 @@ export async function run(inlineConfig?: SponsorkitConfig, t = consola) {
 
   t.info('Composing SVG...')
   const composer = new SvgComposer(config)
-  await (config.customComposer || defaultComposer)(composer, allSponsors, config)
+  await (config.customComposer || defaultComposer)(
+    composer,
+    allSponsors,
+    config
+  )
   let svg = composer.generateSvg()
 
-  svg = await config.onSvgGenerated?.(svg) || svg
+  svg = (await config.onSvgGenerated?.(svg)) || svg
 
   if (config.formats?.includes('svg')) {
     const path = join(dir, `${config.name}.svg`)
@@ -72,52 +75,59 @@ export async function run(inlineConfig?: SponsorkitConfig, t = consola) {
   }
 }
 
-export async function defaultComposer(composer: SvgComposer, sponsors: Sponsorship[], config: SponsorkitConfig) {
-  const tiers = config.tiers!.sort((a, b) => (b.monthlyDollars ?? 0) - (a.monthlyDollars ?? 0))
+export async function defaultComposer(
+  composer: SvgComposer,
+  sponsors: Sponsorship[],
+  config: SponsorkitConfig
+) {
+  const tiers = config.tiers!.sort(
+    (a, b) => (b.monthlyDollars ?? 0) - (a.monthlyDollars ?? 0)
+  )
 
-  const finalSponsors = config.tiers!.filter(i => i.monthlyDollars == null || i.monthlyDollars === 0)
+  const finalSponsors = config.tiers!.filter(
+    (i) => i.monthlyDollars == null || i.monthlyDollars === 0
+  )
 
   if (finalSponsors.length !== 1)
-    throw new Error(`There should be exactly one tier with no \`monthlyDollars\`, but got ${finalSponsors.length}`)
+    throw new Error(
+      `There should be exactly one tier with no \`monthlyDollars\`, but got ${finalSponsors.length}`
+    )
 
-  const partitions: Sponsorship[][] = Array.from({ length: tiers.length }, () => [])
+  const partitions: Sponsorship[][] = Array.from(
+    { length: tiers.length },
+    () => []
+  )
 
   sponsors
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+    // .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
     .forEach((i) => {
-      let index = tiers.findIndex(t => i.monthlyDollars >= (t.monthlyDollars || 0)) || 0
-      if (index === -1)
-        index = 0
+      let index =
+        tiers.findIndex((t) => i.monthlyDollars >= (t.monthlyDollars || 0)) || 0
+      if (index === -1) index = 0
       partitions[index].push(i)
     })
 
   composer.addSpan(config.padding?.top ?? 20)
 
-  tiers
-    .forEach((t, i) => {
-      const sponsors = partitions[i]
-      t.composeBefore?.(composer, sponsors, config)
-      if (t.compose) {
-        t.compose(composer, sponsors, config)
-      }
-      else {
-        if (sponsors.length) {
-          const paddingTop = t.padding?.top ?? 20
-          const paddingBottom = t.padding?.bottom ?? 10
-          if (paddingTop)
-            composer.addSpan(paddingTop)
-          if (t.title) {
-            composer
-              .addTitle(t.title)
-              .addSpan(5)
-          }
-          composer.addSponsorGrid(sponsors, t.preset || presets.base)
-          if (paddingBottom)
-            composer.addSpan(paddingBottom)
+  tiers.forEach((t, i) => {
+    const sponsors = partitions[i]
+    t.composeBefore?.(composer, sponsors, config)
+    if (t.compose) {
+      t.compose(composer, sponsors, config)
+    } else {
+      if (sponsors.length) {
+        const paddingTop = t.padding?.top ?? 20
+        const paddingBottom = t.padding?.bottom ?? 10
+        if (paddingTop) composer.addSpan(paddingTop)
+        if (t.title) {
+          composer.addTitle(t.title).addSpan(5)
         }
+        composer.addSponsorGrid(sponsors, t.preset || presets.base)
+        if (paddingBottom) composer.addSpan(paddingBottom)
       }
-      t.composeAfter?.(composer, sponsors, config)
-    })
+    }
+    t.composeAfter?.(composer, sponsors, config)
+  })
 
   composer.addSpan(config.padding?.bottom ?? 20)
 }
