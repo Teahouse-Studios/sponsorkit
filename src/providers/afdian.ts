@@ -32,6 +32,7 @@ export async function fetchAfdianSponsors(
         generatePOSTData(id, token, JSON.stringify({ page }))
       ),
     })
+    console.log(sponsorshipData)
     sponsors.push(
       ...sponsorshipData.data.list.map(
         (user: any): Sponsorship => ({
