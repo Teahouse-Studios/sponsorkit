@@ -5,6 +5,8 @@ import type { Provider, Sponsorship } from '../types'
 export const AfdianProvider: Provider = {
   name: 'afdian',
   fetchSponsors(config) {
+    console.log(config.afdian.id,
+      config.afdian?.token || config.token!)
     return fetchAfdianSponsors(
       config.afdian.id,
       config.afdian?.token || config.token!
