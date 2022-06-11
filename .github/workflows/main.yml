@@ -1,0 +1,36 @@
+name: Scheduler
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ master ]
+
+jobs:
+  update-sponsors:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set node
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x
+
+      - run: npx pnpm i
+
+      - name: Update sponsors
+        run: npm run build
+        env:
+          SPONSORKIT_AFDIAN_TOKEN: ${{ secrets.AFDIAN_TOKEN }}
+          SPONSORKIT_AFDIAN_ID: ${{ secrets.AFDIAN_ID }}
+
+      - name: Upload
+        uses: Teahouse-Studios/aliyun-oss-action@0.7
+        with:
+          KEY_ID: ${{ secrets.KEY_ID }}
+          KEY_SECRET: ${{ secrets.KEY_SECRET }}
+          BUCKET: frontend-wdljt
+          LOCAL_PATH: ./sponsorkit/
+          REMOTE_PREFIX: meme/sponsors/
