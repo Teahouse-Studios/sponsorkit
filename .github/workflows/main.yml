@@ -21,10 +21,12 @@ jobs:
         with:
           node-version: 16.x
 
-      - run: npx pnpm i
+      - run: |
+          npm i yarn -g
+          yarn
 
       - name: Build Sponsorkit
-        run: npm run build
+        run: yarn build
         
       - name: Run Sponsorkit script
         run: node ./dist/cli.cjs
