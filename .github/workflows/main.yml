@@ -26,8 +26,8 @@ jobs:
       - name: Run Sponsorkit script
         run: node ./dist/cli.cjs
         env:
-          SPONSORKIT_AFDIAN_TOKEN: ${{ secrets.AFDIAN_TOKEN }}
           SPONSORKIT_AFDIAN_ID: ${{ secrets.AFDIAN_ID }}
+          SPONSORKIT_AFDIAN_TOKEN: ${{ secrets.AFDIAN_TOKEN }}
 
       - name: Upload
         uses: Teahouse-Studios/aliyun-oss-action@0.7
