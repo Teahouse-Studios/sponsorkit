@@ -22,6 +22,7 @@ export async function fetchAfdianSponsors(
   const sponsorshipApi = 'https://afdian.net/api/open/query-sponsor'
   let page: number | null = 1
   do {
+    console.log(generatePOSTData(id, token, JSON.stringify({ page })))
     const sponsorshipData = await $fetch(sponsorshipApi, {
       method: 'POST',
       headers: {

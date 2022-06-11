@@ -64,6 +64,7 @@ export async function loadConfig(inlineConfig: SponsorkitConfig = {}) {
     ],
     merge: true,
   })
+  console.log(env)
 
   return {
     ...defaultConfig,
