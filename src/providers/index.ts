@@ -1,12 +1,14 @@
 import type { Provider, ProviderName, SponsorkitConfig } from '../types'
 import { GitHubProvider } from './github'
 import { PatreonProvider } from './patreon'
+import { AfdianProvider } from './afdian'
 
 export * from './github'
 
 export const ProvidersMap = {
   github: GitHubProvider,
   patreon: PatreonProvider,
+  afdian: AfdianProvider,
 }
 
 export function guessProviders(config: SponsorkitConfig) {
@@ -16,6 +18,9 @@ export function guessProviders(config: SponsorkitConfig) {
 
   if (config.patreon && config.patreon.token)
     items.push('patreon')
+
+  if (config.afdian && config.afdian.token)
+    items.push('afdian')
 
   // fallback
   if (!items.length)

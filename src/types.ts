@@ -7,11 +7,13 @@ export interface BadgePreset {
     size: number
     classes?: string
   }
-  name?: false | {
-    color?: string
-    classes?: string
-    maxLength?: number
-  }
+  name?:
+    | false
+    | {
+        color?: string
+        classes?: string
+        maxLength?: number
+      }
   container?: {
     sidePadding?: number
   }
@@ -45,7 +47,7 @@ export interface Sponsorship {
 
 export type OutputFormat = 'svg' | 'png' | 'json'
 
-export type ProviderName = 'github' | 'patreon'
+export type ProviderName = 'github' | 'patreon' | 'afdian'
 
 export interface ProvidersConfig {
   github?: {
@@ -69,6 +71,22 @@ export interface ProvidersConfig {
      * Patreon Token that have access to your sponsorships.
      *
      * Will read from `SPONSORKIT_PATREON_TOKEN` environment variable if not set.
+     *
+     * @deprecated It's not recommended set this value directly, pass from env or use `.env` file.
+     */
+    token?: string
+  }
+  afdian?: {
+    /**
+     * User id of your afdian account.
+     *
+     * Will read from `SPONSORKIT_AFDIAN_ID` environment variable if not set.
+     */
+    id?: string
+    /**
+     * Afdian Token that have access to your sponsorships.
+     *
+     * Will read from `SPONSORKIT_AFDIAN_TOKEN` environment variable if not set.
      *
      * @deprecated It's not recommended set this value directly, pass from env or use `.env` file.
      */
@@ -120,17 +138,31 @@ export interface SponsorkitConfig extends ProvidersConfig {
   /**
    * Hook to modify sponsors data before rendering.
    */
-  onSponsorsFetched?: (sponsors: Sponsorship[], provider: ProviderName | string) => PromiseLike<void> | void
+  onSponsorsFetched?: (
+    sponsors: Sponsorship[],
+    provider: ProviderName | string
+  ) => PromiseLike<void> | void
 
   /**
    * Hook to get or modify the SVG before writing.
    */
-  onSvgGenerated?: (svg: string) => PromiseLike<string | void | undefined | null> | string | void | undefined | null
+  onSvgGenerated?: (
+    svg: string
+  ) =>
+    | PromiseLike<string | void | undefined | null>
+    | string
+    | void
+    | undefined
+    | null
 
   /**
    * Compose the SVG
    */
-  customComposer?: (composer: SvgComposer, sponsors: Sponsorship[], config: SponsorkitConfig) => PromiseLike<void> | void
+  customComposer?: (
+    composer: SvgComposer,
+    sponsors: Sponsorship[],
+    config: SponsorkitConfig
+  ) => PromiseLike<void> | void
 
   /**
    * Tiers
@@ -179,13 +211,25 @@ export interface Tier {
   /**
    * Replace the default composer with your own.
    */
-  compose?: (composer: SvgComposer, sponsors: Sponsorship[], config: SponsorkitConfig) => void
+  compose?: (
+    composer: SvgComposer,
+    sponsors: Sponsorship[],
+    config: SponsorkitConfig
+  ) => void
   /**
    * Compose the SVG before the main composer.
    */
-  composeBefore?: (composer: SvgComposer, tierSponsors: Sponsorship[], config: SponsorkitConfig) => void
+  composeBefore?: (
+    composer: SvgComposer,
+    tierSponsors: Sponsorship[],
+    config: SponsorkitConfig
+  ) => void
   /**
    * Compose the SVG after the main composer.
    */
-  composeAfter?: (composer: SvgComposer, tierSponsors: Sponsorship[], config: SponsorkitConfig) => void
+  composeAfter?: (
+    composer: SvgComposer,
+    tierSponsors: Sponsorship[],
+    config: SponsorkitConfig
+  ) => void
 }
