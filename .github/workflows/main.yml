@@ -25,7 +25,7 @@ jobs:
         
       - name: Run Sponsorkit script
         run: node ./dist/cli.cjs
-        env:
+        with:
           SPONSORKIT_AFDIAN_ID: ${{ secrets.AFDIAN_ID }}
           SPONSORKIT_AFDIAN_TOKEN: ${{ secrets.AFDIAN_TOKEN }}
 
