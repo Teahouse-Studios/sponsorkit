@@ -1,12 +1,10 @@
 import { createHash } from 'crypto'
-import { $fetch } from 'ohmyfetch'
+import axios from 'axios'
 import type { Provider, Sponsorship } from '../types'
 
 export const AfdianProvider: Provider = {
   name: 'afdian',
   fetchSponsors(config) {
-    console.log(config.afdian.id,
-      config.afdian?.token || config.token!)
     return fetchAfdianSponsors(
       config.afdian.id,
       config.afdian?.token || config.token!
@@ -24,22 +22,19 @@ export async function fetchAfdianSponsors(
   const sponsorshipApi = 'https://afdian.net/api/open/query-sponsor'
   let page: number | null = 1
   do {
-    console.log(Buffer.from(JSON.stringify(
-      generatePOSTData(id, token, JSON.stringify({ page }))
-    )).toString('base64'))
-    const sponsorshipData = await $fetch(sponsorshipApi, {
-      method: 'POST',
+    const sponsorshipData = await axios({
+      url: sponsorshipApi,
+      method: 'post',
       headers: {
         'Content-Type': 'application/json',
       },
-      responseType: 'json',
-      body: JSON.stringify(
+      data: JSON.stringify(
         generatePOSTData(id, token, JSON.stringify({ page }))
       ),
     })
-    console.log(sponsorshipData)
+    console.log(sponsorshipData.data)
     sponsors.push(
-      ...sponsorshipData.data.list.map(
+      ...sponsorshipData.data.data.list.map(
         (user: any): Sponsorship => ({
           sponsor: {
             name: user.user.name.includes('爱发电用户_')
@@ -56,7 +51,7 @@ export async function fetchAfdianSponsors(
         })
       )
     )
-    page = sponsorshipData.data.total_page === page ? null : page + 1
+    page = sponsorshipData.data.data.total_page === page ? null : page + 1
   } while (page)
 
   const processed = sponsors
