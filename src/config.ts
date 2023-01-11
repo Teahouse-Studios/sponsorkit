@@ -18,6 +18,11 @@ export const defaultTiers: Tier[] = [
     monthlyDollars: 30,
     preset: presets.xl,
   },
+  {
+    title: '下界合金镐',
+    monthlyDollars: 50,
+    preset: presets.xl,
+  },
 ]
 
 export const defaultInlineCSS = `
