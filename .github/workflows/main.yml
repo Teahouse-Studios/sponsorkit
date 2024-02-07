@@ -16,20 +16,25 @@ jobs:
       SPONSORKIT_AFDIAN_EXECHANGERATE: '1'
       AFDIAN_EXECHANGERATE: '1'
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
 
       - name: Set node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          # node-version: 20.x
-          cache: yarn
+          node-version: lts/*
+          cache: pnpm
 
-      - run: |
-          npm i yarn -g
-          yarn
+      - name: Setup
+        run: npm i -g @antfu/ni
+
+      - name: Install
+        run: nci
 
       - name: Build Sponsorkit
-        run: yarn build
+        run: nr build
         
       - name: Run Sponsorkit script
         run: node ./dist/cli.cjs
