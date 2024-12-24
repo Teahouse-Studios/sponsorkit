@@ -22,7 +22,7 @@ export async function fetchAfdianSponsors(options: SponsorkitConfig['afdian'] = 
     throw new Error('Afdian id and token are required')
 
   const sponsors: any[] = []
-  const sponsorshipApi = 'https://afdian.net/api/open/query-sponsor'
+  const sponsorshipApi = 'https://afdian.com/api/open/query-sponsor'
   let page = 1
   let pages = 1
   do {
